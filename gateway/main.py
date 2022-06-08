@@ -24,7 +24,7 @@ class ServiceEndpointSchema(pd.BaseModel):
     auth_required: bool
 
     @pd.validator("service_url")
-    def normalize_service_url(cls, v):
+    def normalize_service_url(cls, v: str):
         """
         Removes trailing "/" (if exists)
         """
@@ -32,6 +32,14 @@ class ServiceEndpointSchema(pd.BaseModel):
         if v and v[-1] == "/":
             v = v[:-1]
         return v
+
+    @pd.validator("method")
+    def normalize_method(cls, v: str):
+        """
+        Transform method to uppercase
+        """
+
+        return v.upper()
 
 
 ConfigSchema = List[ServiceEndpointSchema]
@@ -112,7 +120,7 @@ class Gateway(web.Application):
         """
 
         for x in self.config:
-            meth_match = x.method == method.lower()
+            meth_match = x.method == method
             path_match = re.fullmatch(x.path_regex, path)
             if meth_match and path_match:
                 return x
