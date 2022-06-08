@@ -5,7 +5,7 @@ services:
       PYTHONDONTWRITEBYTECODE: 1
       LOG_FILE: gateway.log
       LOG_FORMAT: "%(asctime)s -- [%(funcName)s] %(message)s"
-      LOG_LEVEL: 10 # DEBUG LEVEL
+      LOG_LEVEL: DEBUG
     volumes:
       - ./gateway:/app/
     command: python main.py
@@ -20,7 +20,7 @@ services:
       PYTHONDONTWRITEBYTECODE: 1
       LOG_FILE: profiles.log
       LOG_FORMAT: "%(asctime)s -- [%(funcName)s] %(message)s"
-      LOG_LEVEL: 10 # DEBUG LEVEL
+      LOG_LEVEL: DEBUG
     volumes:
       - ./profiles:/app/
     command: uvicorn main:app --host 0.0.0.0 --port 5000 --reload

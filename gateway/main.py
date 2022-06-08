@@ -11,7 +11,6 @@ logging.basicConfig(
     filename=log_file, format=log_format, level=log_level
 )
 
-
 class ServiceEndpointSchema(pd.BaseModel):
     method: str
     path_regex: str
@@ -52,12 +51,12 @@ class Gateway(web.Application):
     async def send_request(
         self, meth: str, target_url: str, data: str
     ) -> Tuple[str, int]:
-        try:
-            body = json.loads(data)
-        except ValueError:
-            body = None
+        # try:
+        #     body = json.loads(data)
+        # except ValueError:
+        #     body = None
         async with self.session.request(
-            method=meth, url=target_url, json=body
+            method=meth, url=target_url, json=data
         ) as resp:
             return await resp.text(), resp.status
 
