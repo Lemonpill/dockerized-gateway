@@ -1,13 +1,15 @@
-import logging
-import fastapi
-import pydantic
+import logging, fastapi, pydantic, os
 
 app = fastapi.FastAPI()
 profiles = []
 
-log_file = "profiles.app"
-log_format = "%(asctime)s -- [%(funcName)s] %(message)s"
-log_level = logging.DEBUG
+log_file = os.getenv("LOG_FILE")
+log_format = os.getenv("LOG_FORMAT")
+log_level = os.getenv("LOG_LEVEL")
+logging.basicConfig(
+    filename=log_file, format=log_format, level=log_level
+)
+
 logging.basicConfig(filename=log_file, format=log_format, level=log_level)
 
 class ProfileSchema(pydantic.BaseModel):

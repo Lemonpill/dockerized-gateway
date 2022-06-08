@@ -1,12 +1,12 @@
-import logging, json, re, yaml
+import logging, json, re, yaml, os
 import pydantic as pd
 from typing import List, Tuple
 from aiohttp import ClientSession, web
 import aiohttp.web_exceptions as web_exc
 
-log_file = "gateway.app"
-log_format = "%(asctime)s -- [%(funcName)s] %(message)s"
-log_level = logging.DEBUG
+log_file = os.getenv("LOG_FILE")
+log_format = os.getenv("LOG_FORMAT")
+log_level = os.getenv("LOG_LEVEL")
 logging.basicConfig(
     filename=log_file, format=log_format, level=log_level
 )
