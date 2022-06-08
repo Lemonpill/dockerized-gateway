@@ -10,7 +10,6 @@ logging.basicConfig(
     filename=log_file, format=log_format, level=log_level
 )
 
-logging.basicConfig(filename=log_file, format=log_format, level=log_level)
 
 class ProfileSchema(pydantic.BaseModel):
 	f_name: str
