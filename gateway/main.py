@@ -12,6 +12,11 @@ logging.basicConfig(
 )
 
 class ServiceEndpointSchema(pd.BaseModel):
+    """
+    Pydantic model for parsing and validating
+    service endpoint schema
+    """
+
     method: str
     path_regex: str
     service_url: str
@@ -19,6 +24,10 @@ class ServiceEndpointSchema(pd.BaseModel):
 
     @pd.validator("service_url")
     def normalize_service_url(cls, v):
+        """
+        Removes trailing "/" (if exists)
+        """
+
         if v and v[-1] == "/":
             v = v[:-1]
         return v
@@ -28,11 +37,21 @@ ConfigSchema = List[ServiceEndpointSchema]
 
 
 def load_config(path: str) -> List[ServiceEndpointSchema]:
-    config = yaml.safe_load(open(path, "r"))
+    """
+    Loads config from YAML and returns a list of
+    objects, representing available target endpoints
+    """
+
+    with open(path, "r") as f:
+        config = yaml.safe_load(f)
     return [ServiceEndpointSchema(**x) for x in config]
 
 
 class Gateway(web.Application):
+    """
+    A single entrypoint for dockerized JSON APIs
+    """
+
     def __init__(self, config: ConfigSchema, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.config = config
@@ -44,6 +63,12 @@ class Gateway(web.Application):
 
     @staticmethod
     async def client_session_ctx(app):
+        """
+        Creates and properly closes aiohttp ClientSession
+        
+        @app: application
+        """
+
         app.session = ClientSession()
         yield
         await app.client.close()
@@ -51,6 +76,16 @@ class Gateway(web.Application):
     async def send_request(
         self, meth: str, target_url: str, data: str
     ) -> Tuple[str, int]:
+        """
+        Sends json request to a specified endpoint
+        
+        @meth: request method
+        @target_url: target url (base + path)
+        @data: request body
+
+        Returns respose text and status
+        """
+
         async with self.session.request(
             method=meth, url=target_url, json=data
         ) as resp:
@@ -58,7 +93,17 @@ class Gateway(web.Application):
 
     def get_target_endpoint(
         self, method: str, path: str
-    ) -> ServiceEndpointSchema:
+    ) -> ServiceEndpointSchema | None:
+        """
+        Retrieves a target endpoint by performing method and 
+        path matching against the current gateway configuration
+
+        @method: request method
+        @path: request path
+
+        Returns a service endpoint object or None
+        """
+
         for x in self.config:
             meth_match = x.method == method.lower()
             path_match = re.fullmatch(x.path_regex, path)
@@ -66,6 +111,11 @@ class Gateway(web.Application):
                 return x
 
     async def main_handler(self, request: web.Request):
+        """
+        The main route handler
+        Handles all incoming HTTP requests
+        """
+
         ep = self.get_target_endpoint(request.method, request.path)
         if not ep:
             raise web_exc.HTTPNotFound
