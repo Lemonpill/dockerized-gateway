@@ -51,10 +51,6 @@ class Gateway(web.Application):
     async def send_request(
         self, meth: str, target_url: str, data: str
     ) -> Tuple[str, int]:
-        # try:
-        #     body = json.loads(data)
-        # except ValueError:
-        #     body = None
         async with self.session.request(
             method=meth, url=target_url, json=data
         ) as resp:
