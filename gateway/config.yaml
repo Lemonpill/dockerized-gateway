@@ -1,23 +1,28 @@
+# GET http://profiles:5000/profiles
 - method: get
   path_regex: ^\/(profiles)$
   service_url: http://profiles:5000
   auth_required: false
 
+# POST http://profiles:5000/profiles
 - method: post
   path_regex: ^\/(profiles)$
   service_url: http://profiles:5000
   auth_required: false
 
+# GET http://profiles:5000/profiles/{profile_id}
 - method: get
   path_regex: ^\/(profiles)+\/+[a-zA-Z0-9]$
   service_url: http://profiles:5000
   auth_required: false
 
+# PATCH http://profiles:5000/profiles/{profile_id}
 - method: patch
   path_regex: ^\/(profiles)+\/+[a-zA-Z0-9]$
   service_url: http://profiles:5000
   auth_required: false
 
+# DELETE http://profiles:5000/profiles/{profile_id}
 - method: delete
   path_regex: ^\/(profiles)+\/+[a-zA-Z0-9]$
   service_url: http://profiles:5000
