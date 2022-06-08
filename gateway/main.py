@@ -1,3 +1,4 @@
+import json
 import logging, re, yaml, os
 import pydantic as pd
 from typing import List, Tuple
@@ -134,10 +135,19 @@ class Gateway(web.Application):
         ep = self.get_target_endpoint(request.method, request.path)
         if not ep:
             raise web_exc.HTTPNotFound
+
+        request_body = None
+
+        if request.has_body:
+            try:
+                request_body = await request.json()
+            except:
+                raise web_exc.HTTPBadRequest
+        
         body, status = await self.send_request(
             ep.method,
             ep.service_url + request.path,
-            await request.text(),
+            request_body,
         )
         return web.json_response(text=body, status=status)
 
