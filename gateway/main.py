@@ -11,6 +11,7 @@ logging.basicConfig(
     filename=log_file, format=log_format, level=log_level
 )
 
+
 class ServiceEndpointSchema(pd.BaseModel):
     """
     Pydantic model for parsing and validating
@@ -52,20 +53,26 @@ class Gateway(web.Application):
     A single entrypoint for dockerized JSON APIs
     """
 
-    def __init__(self, config: ConfigSchema, *args, **kwargs) -> None:
+    def __init__(
+        self, config: ConfigSchema, *args, **kwargs
+    ) -> None:
         super().__init__(*args, **kwargs)
         self.config = config
         self.session: ClientSession
         self.cleanup_ctx.append(self.client_session_ctx)
         self.add_routes(
-            [web.route("*", "/{tail:.*}", handler=self.main_handler)]
+            [
+                web.route(
+                    "*", "/{tail:.*}", handler=self.main_handler
+                )
+            ]
         )
 
     @staticmethod
     async def client_session_ctx(app):
         """
         Creates and properly closes aiohttp ClientSession
-        
+
         @app: application
         """
 
@@ -78,7 +85,7 @@ class Gateway(web.Application):
     ) -> Tuple[str, int]:
         """
         Sends json request to a specified endpoint
-        
+
         @meth: request method
         @target_url: target url (base + path)
         @data: request body
@@ -95,7 +102,7 @@ class Gateway(web.Application):
         self, method: str, path: str
     ) -> ServiceEndpointSchema | None:
         """
-        Retrieves a target endpoint by performing method and 
+        Retrieves a target endpoint by performing method and
         path matching against the current gateway configuration
 
         @method: request method
