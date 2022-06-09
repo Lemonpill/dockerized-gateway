@@ -63,11 +63,11 @@ class Gateway(web.Application):
 
         # Format -- Authorization: Bearer <TOKEN>
         if "Authorization" in request.headers.keys():
-            token = request.headers["Authorization"][7:]
             try:
+                token = request.headers["Authorization"][7:]
                 data = jwt.decode(token=token, key=self.settings.jwt_key, algorithms=[self.settings.jwt_alg])
                 return UserSchema(**data)
-            except JWTError: pass
+            except: pass  # Return None
 
     async def send_request(
         self, headers: dict | None, meth: str, url: str, data: str
