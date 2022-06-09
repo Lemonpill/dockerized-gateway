@@ -32,10 +32,12 @@ sequenceDiagram
  participant  S as Profiles (unexposed)
  Note over C,S: Successful interaction
  C->>G: POST /profiles
+ Note right of G: Endpoint in config
  G->>S: POST /profiles
  S-->>G: 201 Created
  G-->>C: 201 Created
  Note over C,S: Unsuccessful interaction
  C->>G: GET /no-such-route
+ Note right of G: Endpoint not in config
  G->>C: 404 Not Found
 ```
