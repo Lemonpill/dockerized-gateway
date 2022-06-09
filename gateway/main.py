@@ -109,7 +109,7 @@ class Gateway(web.Application):
                 return x
 
     async def send_request(
-        self, meth: str, target_url: str, data: str
+        self, meth: str, url: str, data: str
     ) -> Tuple[str, int]:
         """
         Sends json request to a specified endpoint
@@ -122,7 +122,7 @@ class Gateway(web.Application):
         """
 
         async with self.session.request(
-            method=meth, url=target_url, json=data
+            method=meth, url=url, json=data
         ) as resp:
             return await resp.text(), resp.status
 
@@ -131,32 +131,32 @@ class Gateway(web.Application):
         Handles all incoming HTTP requests
         """
 
+        # Retrieve target endpoint or raise 404 Not Found
         ep = self.get_target_endpoint(request.method, request.path)
         if not ep:
             raise web_exc.HTTPNotFound
         
-        ## DEBUG ##
-        logging.debug(f"json:   {await request.json()}")
-        logging.debug(f"read:   {await request.read()}")
-        logging.debug(f"text:   {await request.text()}")
-        
-        return web.Response(text="OK")
-        ###########
+        request_method = ep.method
+        target_url = ep.service_url + request.path
 
-        # request_body = None
-
-        # if request.has_body:
-        #     try:
-        #         request_body = await request.json()
-        #     except:
-        #         raise web_exc.HTTPBadRequest
+        # JSON Serialize request body or raise 400 Bad Request
+        if request.can_read_body:
+            try:
+                request_body = await request.json()
+            except ValueError:
+                raise web_exc.HTTPBadRequest
+        else:
+            request_body = None
         
-        body, status = await self.send_request(
-            ep.method,
-            ep.service_url + request.path,
-            await request.read(),
+        # Send acquired data to the target endpoint
+        response_body, response_status = await self.send_request(
+            meth=request_method,
+            url=target_url,
+            data=request_body,
         )
-        return web.json_response(text=body, status=status)
+
+        # Respond to the client with received content and status
+        return web.json_response(body=response_body, status=response_status)
 
 
 if __name__ == "__main__":
