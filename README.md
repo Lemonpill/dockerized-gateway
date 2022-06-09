@@ -22,3 +22,20 @@
 - PATCH profile by ID http://localhost:8000/profiles/{profile_id}
 - DELETE profile by ID http://localhost:8000/profiles/{profile_id}
 
+
+## Sequence Diagram
+
+```mermaid
+sequenceDiagram  
+ participant  C as Client
+ participant  G as Gateway
+ participant  S as Profiles (unexposed)
+ Note over C,S: Successful interaction
+ C->>G: POST /profiles
+ G->>S: POST /profiles
+ S-->>G: 201 Created
+ G-->>C: 201 Created
+ Note over C,S: Unsuccessful interaction
+ C->>G: GET /no-such-route
+ G->>C: 404 Not Found
+```
