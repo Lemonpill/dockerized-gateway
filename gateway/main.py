@@ -13,7 +13,7 @@ logging.basicConfig(
 )
 
 
-class ServiceEndpointSchema(pd.BaseModel):
+class _ServiceEndpointSchema(pd.BaseModel):
     """
     Pydantic model for parsing and validating
     service endpoint schema
@@ -43,10 +43,10 @@ class ServiceEndpointSchema(pd.BaseModel):
         return v.upper()
 
 
-ConfigSchema = List[ServiceEndpointSchema]
+_ConfigSchema = List[_ServiceEndpointSchema]
 
 
-def load_config(path: str) -> List[ServiceEndpointSchema]:
+def load_config(path: str) -> List[_ServiceEndpointSchema]:
     """
     Loads config from YAML and returns a list of
     objects, representing available target endpoints
@@ -54,7 +54,7 @@ def load_config(path: str) -> List[ServiceEndpointSchema]:
 
     with open(path, "r") as f:
         config = yaml.safe_load(f)
-    return [ServiceEndpointSchema(**x) for x in config]
+    return [_ServiceEndpointSchema(**x) for x in config]
 
 
 class Gateway(web.Application):
@@ -63,7 +63,7 @@ class Gateway(web.Application):
     """
 
     def __init__(
-        self, config: ConfigSchema, *args, **kwargs
+        self, config: _ConfigSchema, *args, **kwargs
     ) -> None:
         super().__init__(*args, **kwargs)
         self.config = config
@@ -89,6 +89,25 @@ class Gateway(web.Application):
         yield
         await app.client.close()
 
+    def get_target_endpoint(
+        self, method: str, path: str
+    ) -> _ServiceEndpointSchema | None:
+        """
+        Retrieves a target endpoint by performing method and
+        path matching against the current gateway configuration
+
+        @method: request method
+        @path: request path
+
+        Returns a service endpoint object or None
+        """
+
+        for x in self.config:
+            meth_match = x.method == method
+            path_match = re.fullmatch(x.path_regex, path)
+            if meth_match and path_match:
+                return x
+
     async def send_request(
         self, meth: str, target_url: str, data: str
     ) -> Tuple[str, int]:
@@ -107,28 +126,8 @@ class Gateway(web.Application):
         ) as resp:
             return await resp.text(), resp.status
 
-    def get_target_endpoint(
-        self, method: str, path: str
-    ) -> ServiceEndpointSchema | None:
-        """
-        Retrieves a target endpoint by performing method and
-        path matching against the current gateway configuration
-
-        @method: request method
-        @path: request path
-
-        Returns a service endpoint object or None
-        """
-
-        for x in self.config:
-            meth_match = x.method == method
-            path_match = re.fullmatch(x.path_regex, path)
-            if meth_match and path_match:
-                return x
-
     async def main_handler(self, request: web.Request):
         """
-        The main route handler
         Handles all incoming HTTP requests
         """
 
