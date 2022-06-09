@@ -16,7 +16,7 @@ class ProfileSchema(pydantic.BaseModel):
 	l_name: str
 
 @app.get("/profiles")
-async def get_profiles(request: fastapi.Request, response: fastapi.Response):
+async def get_profiles():
 	global profiles
 	return profiles
 
