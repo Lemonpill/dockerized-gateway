@@ -6,6 +6,9 @@ services:
       SERVER_HOST: 0.0.0.0
       SERVER_PORT: 5000
       CONFIG_FILE: config.yaml
+      # CHANGE THIS #
+      JWT_KEY: f0a26ed99c8033ea873a8d4dab66d2c406771ea023b26fdc72cbe94b9b962761
+      JWT_ALG: HS256
       LOG_FILE: gateway.log
       LOG_FORMAT: "%(asctime)s -- [%(funcName)s] %(message)s"
       LOG_LEVEL: DEBUG
