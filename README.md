@@ -4,7 +4,7 @@
  - [x] Utilizes both AIOHTTP Server and Client functionalities
  - [x] Incoming requests are matched against a config file and discarded in case of no match
  - [x] Both Server and Client operate async, allowing best performance
- - [ ] TODO: Add JWT authentication
+ - [x] Supports JWT authentication (appends "User-ID" header to service requests)
  - [ ] TODO: Create GET /stats endpoint
 
 
@@ -21,6 +21,12 @@
 - GET profile by ID http://localhost:8000/profiles/{profile_id}
 - PATCH profile by ID http://localhost:8000/profiles/{profile_id}
 - DELETE profile by ID http://localhost:8000/profiles/{profile_id}
+
+
+## Authentication
+1. Use https://www.jwt.io to generate a JWT (include "user_id" in payload and use compose.yaml JWT_KEY to encode)
+2. Include `Authorization: Bearer {your_token}` in your request headers
+3. Send requests to available endpoints
 
 
 ## Sequence Diagram

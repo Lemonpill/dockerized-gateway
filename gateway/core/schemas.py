@@ -32,4 +32,8 @@ class ServiceEndpointSchema(pydantic.BaseModel):
         return v.upper()
 
 
+class UserSchema(pydantic.BaseModel):
+    id: str
+
+
 ConfigSchema = typing.List[ServiceEndpointSchema]  # noqa

@@ -14,16 +14,16 @@
 - method: get
   path_regex: ^\/(profiles)+\/+[a-zA-Z0-9]$
   service_url: http://profiles:5000
-  auth_required: false
+  auth_required: true
 
 # PATCH http://profiles:5000/profiles/{profile_id}
 - method: patch
   path_regex: ^\/(profiles)+\/+[a-zA-Z0-9]$
   service_url: http://profiles:5000
-  auth_required: false
+  auth_required: true
 
 # DELETE http://profiles:5000/profiles/{profile_id}
 - method: delete
   path_regex: ^\/(profiles)+\/+[a-zA-Z0-9]$
   service_url: http://profiles:5000
-  auth_required: false
+  auth_required: true

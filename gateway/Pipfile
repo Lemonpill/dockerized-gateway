@@ -8,6 +8,7 @@ aiohttp = "*"
 pydantic = "*"
 pyyaml = "*"
 black = "*"
+python-jose = {extras = ["cryptography"], version = "*"}
 
 [dev-packages]
 
