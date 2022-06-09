@@ -1,7 +1,7 @@
 # JSON API Gateway
 
- - [x] Utilizes both AIOHTTP Server and Client functionalities
  - [x] Provides a single entry point for dockerized JSON APIs
+ - [x] Utilizes both AIOHTTP Server and Client functionalities
  - [x] Incoming requests are matched against a config file and discarded in case of no match
  - [x] Both Server and Client operate async, allowing best performance
  - [ ] TODO: Add JWT authentication
