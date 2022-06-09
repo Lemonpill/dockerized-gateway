@@ -24,7 +24,7 @@
 
 
 ## Authentication
-1. Use https://www.jwt.io to generate a JWT (include "user_id" in payload and use compose.yaml JWT_KEY to encode)
+1. Use https://www.jwt.io to generate a JWT (include "sub" in payload and use compose.yaml JWT_KEY to encode)
 2. Include `Authorization: Bearer {your_token}` in your request headers
 3. Send requests to available endpoints
 
