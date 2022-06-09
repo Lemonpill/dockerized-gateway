@@ -20,7 +20,7 @@ class Gateway(web.Application):
         self.session: ClientSession
         self.cleanup_ctx.append(self.client_session_ctx)
         self.router.add_route(
-            web.route("*", "/{tail:.*}", handler=self.main_handler)
+            method="*", path="/{tail:.*}", handler=self.main_handler
         )
 
     @staticmethod
