@@ -87,7 +87,7 @@ class Gateway(web.Application):
 
         app.session = ClientSession()
         yield
-        await app.client.close()
+        await app.session.close()
 
     def get_target_endpoint(
         self, method: str, path: str
@@ -134,19 +134,27 @@ class Gateway(web.Application):
         ep = self.get_target_endpoint(request.method, request.path)
         if not ep:
             raise web_exc.HTTPNotFound
+        
+        ## DEBUG ##
+        logging.debug(f"json:   {await request.json()}")
+        logging.debug(f"read:   {await request.read()}")
+        logging.debug(f"text:   {await request.text()}")
+        
+        return web.Response(text="OK")
+        ###########
 
-        request_body = None
+        # request_body = None
 
-        if request.has_body:
-            try:
-                request_body = await request.json()
-            except:
-                raise web_exc.HTTPBadRequest
+        # if request.has_body:
+        #     try:
+        #         request_body = await request.json()
+        #     except:
+        #         raise web_exc.HTTPBadRequest
         
         body, status = await self.send_request(
             ep.method,
             ep.service_url + request.path,
-            request_body,
+            await request.read(),
         )
         return web.json_response(text=body, status=status)
 
