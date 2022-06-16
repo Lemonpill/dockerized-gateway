@@ -64,6 +64,9 @@ services:
       LOG_FILE: auth.log
       LOG_FORMAT: "%(asctime)s -- [%(funcName)s] %(message)s"
       LOG_LEVEL: DEBUG
+      JWT_KEY: f0a26ed99c8033ea873a8d4dab66d2c406771ea023b26fdc72cbe94b9b962761
+      JWT_ALG: HS256
+      JWT_EXP: 30
     volumes:
       - ./auth:/app/
     command: uvicorn main:app --host 0.0.0.0 --port 5000 --reload
