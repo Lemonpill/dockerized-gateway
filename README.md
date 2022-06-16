@@ -62,7 +62,7 @@ sequenceDiagram
  C->>G: GET /no-such-route
  Note right of G: Endpoint not in config
  G-->>C: 404 Not Found
- Note right of G: Unauthorized
  C->>G: GET /profiles [MISSING/INVALID TOKEN]
+ Note right of G: Unauthorized
  G-->>C: 401 Unauthorized
 ```
