@@ -5,7 +5,7 @@ import aiohttp.web_exceptions as web_exc
 from charset_normalizer import logging
 from jose import jwt, JWTError
 
-from .schemas import ServiceEndpointSchema, UserSchema
+from .schemas import ServiceEndpointSchema, TokenUserSchema
 from .settings import Settings
 
 
@@ -56,7 +56,7 @@ class Gateway(web.Application):
             if meth_match and path_match:
                 return x
 
-    def get_user_auth(self, request: web.Request) -> UserSchema | None:
+    def get_user_auth(self, request: web.Request) -> TokenUserSchema | None:
         """
         Decodes JWT and returns a user object or None
         """
@@ -66,7 +66,8 @@ class Gateway(web.Application):
             token = request.headers["Authorization"][7:]
             try:
                 data = jwt.decode(token=token, key=self.settings.jwt_key, algorithms=[self.settings.jwt_alg])
-                return UserSchema(**data)
+                logging.debug(data)
+                return TokenUserSchema(**data)
             except: pass  # Return None
 
     async def send_request(
@@ -108,7 +109,7 @@ class Gateway(web.Application):
             user = self.get_user_auth(request)
             if not user:
                 raise web_exc.HTTPUnauthorized
-            send_headers.update({"User-ID": user.id})
+            send_headers["user"] = user.sub
 
         # JSON Serialize request body or raise 400 Bad Request
         if request.can_read_body:
