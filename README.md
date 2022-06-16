@@ -11,21 +11,25 @@
 ## Usage
 
 1. Run `docker compose up` for local development
-2. Send some requests to available endpoints
+2. In the AUTH container, run `alembic upgrade heads` and `alembic revision --autogenerate` to run necessary migrations
+3. Send some requests to available endpoints
 
 
 ## Available Endpoints
 
-- GET existing profiles http://localhost:8000/profiles
-- POST create a profile http://localhost:8000/profiles
-- GET profile by ID http://localhost:8000/profiles/{profile_id}
-- PATCH profile by ID http://localhost:8000/profiles/{profile_id}
-- DELETE profile by ID http://localhost:8000/profiles/{profile_id}
+- POST create a user http://auth:8000/auth/users (PUBLIC)
+- POST create an access token http://auth:8000/auth/token (PUBLIC)
+- GET existing profiles http://localhost:8000/profiles (JWT REQUIRED)
+- POST create a profile http://localhost:8000/profiles (JWT REQUIRED)
+- GET profile by ID http://localhost:8000/profiles/{profile_id} (JWT REQUIRED)
+- PATCH profile by ID http://localhost:8000/profiles/{profile_id} (JWT REQUIRED)
+- DELETE profile by ID http://localhost:8000/profiles/{profile_id} (JWT REQUIRED)
 
 
 ## Authentication
-1. Use https://www.jwt.io to generate a JWT (include "sub" in payload and use compose.yaml JWT_KEY to encode)
-2. Include `Authorization: Bearer {your_token}` in your request headers
+1. Use POST /auth/users to create a user
+2. Send your credentials over to POST /auth/token in order to generate a JWT
+3. Include `Authorization: Bearer {your_token}` in your request headers
 
 
 ## Sequence Diagram
@@ -35,14 +39,30 @@ sequenceDiagram
  participant  C as Client
  participant  G as Gateway
  participant  S as Profiles (unexposed)
- Note over C,S: Successful interaction
- C->>G: POST /profiles
- Note right of G: Endpoint in config
- G->>S: POST /profiles
+ participant  A as Auth (unexposed)
+ Note over C, A: Authentication flow
+ C->>G: POST /auth/users
+ G->>A: POST /auth/users
+ A->>G: 201 Created
+ G->>C: 201 Created
+ C->>G: POST /auth/token
+ G->>A: POST /auth/token
+ A->>G: 201 Created [TOKEN]
+ G->>C: 201 Created [TOKEN]
+ Note over C,S: Endpoints requiring authentication
+ C->>G: POST /profiles [Authentication: Bearer <TOKEN>]
+ G->>S: POST /profiles [User: <USERNAME>]
  S-->>G: 201 Created
  G-->>C: 201 Created
+ C->>G: GET, PATCH, ... /profiles/{profile_id} [Authentication: Bearer <TOKEN>]
+ G->>S: GET, PATCH, ... /profiles/{profile_id} [User: <USERNAME>]
+ S-->>G: 200 OK
+ G-->>C: 200 OK
  Note over C,S: Unsuccessful interaction
  C->>G: GET /no-such-route
  Note right of G: Endpoint not in config
  G->>C: 404 Not Found
+ Note right of G: Unauthorized
+ C->>G: GET /profiles [MISSING/INVALID TOKEN]
+ G->>C: 401 Unauthorized
 ```
