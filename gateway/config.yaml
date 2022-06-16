@@ -1,33 +1,3 @@
-# GET http://profiles:5000/profiles
-- method: get
-  path_regex: ^\/(profiles)$
-  service_url: http://profiles:5000
-  auth_required: false
-
-# POST http://profiles:5000/profiles
-- method: post
-  path_regex: ^\/(profiles)$
-  service_url: http://profiles:5000
-  auth_required: false
-
-# GET http://profiles:5000/profiles/{profile_id}
-- method: get
-  path_regex: ^\/(profiles)+\/+[a-zA-Z0-9]$
-  service_url: http://profiles:5000
-  auth_required: true
-
-# PATCH http://profiles:5000/profiles/{profile_id}
-- method: patch
-  path_regex: ^\/(profiles)+\/+[a-zA-Z0-9]$
-  service_url: http://profiles:5000
-  auth_required: true
-
-# DELETE http://profiles:5000/profiles/{profile_id}
-- method: delete
-  path_regex: ^\/(profiles)+\/+[a-zA-Z0-9]$
-  service_url: http://profiles:5000
-  auth_required: true
-
 # POST http://auth:5000/auth/users
 - method: post
   path_regex: ^\/(auth)+\/(users)$
@@ -39,3 +9,33 @@
   path_regex: ^\/(auth)+\/(token)$
   service_url: http://auth:5000
   auth_required: false
+
+# GET http://profiles:5000/profiles
+- method: get
+  path_regex: ^\/(profiles)$
+  service_url: http://profiles:5000
+  auth_required: true
+
+# POST http://profiles:5000/profiles
+- method: post
+  path_regex: ^\/(profiles)$
+  service_url: http://profiles:5000
+  auth_required: true
+
+# GET http://profiles:5000/profiles/{profile_id}
+- method: get
+  path_regex: ^\/(profiles)+\/+[\w]{1,16}$
+  service_url: http://profiles:5000
+  auth_required: true
+
+# PATCH http://profiles:5000/profiles/{profile_id}
+- method: patch
+  path_regex: ^\/(profiles)+\/+[\w]{1,16}$
+  service_url: http://profiles:5000
+  auth_required: true
+
+# DELETE http://profiles:5000/profiles/{profile_id}
+- method: delete
+  path_regex: ^\/(profiles)+\/+[\w]{1,16}$
+  service_url: http://profiles:5000
+  auth_required: true
