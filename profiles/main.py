@@ -27,6 +27,7 @@ async def add_profile(data: ProfileSchema):
 
 @app.get("/profiles/{profile_id}")
 async def get_profile(profile_id: int):
+	global profiles
 	if 0 <= profile_id < len(profiles):
 		return profiles[profile_id]
 	raise fastapi.HTTPException(404)
