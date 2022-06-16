@@ -4,7 +4,7 @@
  - [x] Utilizes both AIOHTTP Server and Client functionalities
  - [x] Incoming requests are matched against a config file and discarded in case of no match
  - [x] Both Server and Client operate async, allowing best performance
- - [x] Supports JWT authentication (appends "user" header to service requests)
+ - [x] Supports JWT authentication (appends "user" header to requests after successful authentication)
  - [ ] TODO: Create GET /stats endpoint
 
 
