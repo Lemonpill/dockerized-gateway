@@ -32,7 +32,11 @@ class ServiceEndpointSchema(pydantic.BaseModel):
         return v.upper()
 
 
-class TokenUserSchema(pydantic.BaseModel):
+class JWTPayloadSchema(pydantic.BaseModel):
+    """
+    Parse and validate JWT payload
+    """
+
     sub: str
     exp: int
 
