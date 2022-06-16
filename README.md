@@ -27,8 +27,8 @@
 
 
 ## Authentication
-1. Use POST /auth/users to create a user
-2. Send your credentials over to POST /auth/token in order to generate a JWT
+1. Use POST /auth/users to create a user ({"username": string, "password": string})
+2. Send your credentials ({"username": string, "password": string}) over to POST /auth/token in order to generate a JWT
 3. Include `Authorization: Bearer {your_token}` in your request headers
 
 
