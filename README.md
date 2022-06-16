@@ -54,8 +54,8 @@ sequenceDiagram
  G->>S: POST /profiles [User: <USERNAME>]
  S-->>G: 201 Created
  G-->>C: 201 Created
- C->>G: GET, PATCH, ... /profiles/{profile_id} [Authentication: Bearer <TOKEN>]
- G->>S: GET, PATCH, ... /profiles/{profile_id} [User: <USERNAME>]
+ C->>G: GET /profiles [Authentication: Bearer <TOKEN>]
+ G->>S: GET /profiles [User: <USERNAME>]
  S-->>G: 200 OK
  G-->>C: 200 OK
  Note over C,S: Unsuccessful interaction
