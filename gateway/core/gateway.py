@@ -10,8 +10,9 @@ from .settings import Settings
 
 """
 TODO:
-1. Implement refresh tokens
-2. Implement token revocation
+1. Client error handling (timeouts, etc.)
+2. Implement refresh tokens
+3. Implement token revocation
 """
 
 
@@ -60,29 +61,26 @@ class Gateway(web.Application):
             if meth_match and path_match:
                 return x
 
-    def get_user_auth(self, request: web.Request) -> JWTPayloadSchema | None:
+    def get_jwt_payload(self, token: str) -> JWTPayloadSchema | None:
         """
         Decodes JWT and returns a JWT payload object or None
         """
 
         # Format -- Authorization: Bearer <TOKEN>
-        if "Authorization" in request.headers.keys():
-            token = request.headers["Authorization"][7:]
-            try:
-                data = jwt.decode(
-                    token=token,
-                    key=self.settings.jwt_key,
-                    algorithms=[self.settings.jwt_alg],
-                )
-                return JWTPayloadSchema(**data)
-            except:
-                pass  # Return None
+        try:
+            data = jwt.decode(
+                token=token,
+                key=self.settings.jwt_key,
+                algorithms=[self.settings.jwt_alg],
+            )
+            return JWTPayloadSchema(**data)
+        except: ... # Return None
 
     async def send_request(
         self, headers: dict, meth: str, url: str, data: str | None
     ) -> typing.Tuple[str, int]:
         """
-        Sends json request to a specified endpoint
+        Sends JSON request to a specified endpoint
 
         @headers:       Additional headers dictionary
         @meth:          Request method
@@ -114,10 +112,14 @@ class Gateway(web.Application):
 
         # JWT Authentication
         if ep.auth_required:
-            user = self.get_user_auth(request)
-            if not user:
-                raise web_exc.HTTPUnauthorized
-            send_headers["user"] = user.sub
+            auth_exc = web_exc.HTTPUnauthorized
+            if "Authorization" not in request.headers:
+                raise auth_exc
+            jwt_token = request.headers["Authorization"][7:]
+            jwt_payload = self.get_jwt_payload(jwt_token)
+            if not jwt_payload:
+                raise auth_exc
+            send_headers["user"] = jwt_payload.sub
 
         # JSON Serialize request body or raise 400 Bad Request
         if request.can_read_body:
