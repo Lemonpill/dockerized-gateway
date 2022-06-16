@@ -27,3 +27,15 @@
   path_regex: ^\/(profiles)+\/+[a-zA-Z0-9]$
   service_url: http://profiles:5000
   auth_required: true
+
+# POST http://auth:5000/auth/users
+- method: post
+  path_regex: ^\/(auth)+\/(users)$
+  service_url: http://auth:5000
+  auth_required: false
+
+# POST http://auth:5000/auth/token
+- method: post
+  path_regex: ^\/(auth)+\/(token)$
+  service_url: http://auth:5000
+  auth_required: false
