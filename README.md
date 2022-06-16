@@ -11,7 +11,7 @@
 ## Usage
 
 1. Run `docker compose up` for local development
-2. In the AUTH container, run `alembic upgrade heads` and `alembic revision --autogenerate` to run necessary migrations
+2. In the AUTH container, run `alembic upgrade heads` and `alembic revision --autogenerate` to apply necessary migrations
 3. Send some requests to available endpoints
 
 
