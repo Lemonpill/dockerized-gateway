@@ -34,7 +34,7 @@ class Gateway(web.Application):
         """
         Creates and properly closes aiohttp ClientSession
 
-        @app: application
+        @app:           application
         """
 
         app.session = ClientSession()
@@ -48,8 +48,8 @@ class Gateway(web.Application):
         Retrieves a target endpoint by performing method and
         path matching against the current gateway configuration
 
-        @method: request method
-        @path: request path
+        @method:        request method
+        @path:          request path
 
         Returns a service endpoint object or None
         """
@@ -74,7 +74,6 @@ class Gateway(web.Application):
                     key=self.settings.jwt_key,
                     algorithms=[self.settings.jwt_alg],
                 )
-                logging.debug(data)
                 return JWTPayloadSchema(**data)
             except:
                 pass  # Return None
