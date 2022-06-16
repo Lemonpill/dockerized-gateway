@@ -1,12 +1,18 @@
 import re, typing
-from urllib import response
-from aiohttp import web, ClientSession, ClientRequest
+from aiohttp import web, ClientSession
 import aiohttp.web_exceptions as web_exc
 from charset_normalizer import logging
-from jose import jwt, JWTError
+from jose import jwt
 
-from .schemas import ServiceEndpointSchema, TokenUserSchema
+from .schemas import ServiceEndpointSchema, JWTPayloadSchema
 from .settings import Settings
+
+
+"""
+TODO:
+1. Implement refresh tokens
+2. Implement token revocation
+"""
 
 
 class Gateway(web.Application):
@@ -14,9 +20,7 @@ class Gateway(web.Application):
     A single entrypoint for dockerized JSON APIs
     """
 
-    def __init__(
-        self, *args, **kwargs
-    ) -> None:
+    def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
         self.settings = Settings()
         self.session: ClientSession
@@ -56,36 +60,41 @@ class Gateway(web.Application):
             if meth_match and path_match:
                 return x
 
-    def get_user_auth(self, request: web.Request) -> TokenUserSchema | None:
+    def get_user_auth(self, request: web.Request) -> JWTPayloadSchema | None:
         """
-        Decodes JWT and returns a user object or None
+        Decodes JWT and returns a JWT payload object or None
         """
 
         # Format -- Authorization: Bearer <TOKEN>
         if "Authorization" in request.headers.keys():
             token = request.headers["Authorization"][7:]
             try:
-                data = jwt.decode(token=token, key=self.settings.jwt_key, algorithms=[self.settings.jwt_alg])
+                data = jwt.decode(
+                    token=token,
+                    key=self.settings.jwt_key,
+                    algorithms=[self.settings.jwt_alg],
+                )
                 logging.debug(data)
-                return TokenUserSchema(**data)
-            except: pass  # Return None
+                return JWTPayloadSchema(**data)
+            except:
+                pass  # Return None
 
     async def send_request(
-        self, headers: dict | None, meth: str, url: str, data: str
+        self, headers: dict, meth: str, url: str, data: str | None
     ) -> typing.Tuple[str, int]:
         """
         Sends json request to a specified endpoint
 
-        @meth: request method
-        @target_url: target url (base + path)
-        @data: request body
-        @user: user ID
+        @headers:       Additional headers dictionary
+        @meth:          Request method
+        @target_url:    Target URL (base + path)
+        @data:          Request body
 
         Returns respose text and status
         """
 
         async with self.session.request(
-            headers=headers, method=meth, url=url, json=data 
+            headers=headers, method=meth, url=url, json=data
         ) as resp:
             return await resp.text(), resp.status
 
@@ -99,7 +108,7 @@ class Gateway(web.Application):
         if not ep:
             raise web_exc.HTTPNotFound
 
-        send_method = ep.method        
+        send_method = ep.method
         send_url = ep.service_url + request.path
         send_headers = {}
         send_body = None
