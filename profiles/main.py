@@ -24,7 +24,7 @@ async def get_profiles(request: fastapi.Request):
 		"endpoint": "GET /profiles",
 		"authentication": "required",
 		"status": "success",
-		"current_user": request.headers["User"]
+		"current_user": request.headers["user"]
 	}
 
 @app.post("/profiles")
@@ -34,7 +34,7 @@ async def add_profile(request: fastapi.Request):
 		"endpoint": "POST /profiles",
 		"authentication": "required",
 		"status": "success",
-		"current_user": request.headers["User"]
+		"current_user": request.headers["user"]
 	}
 
 @app.get("/profiles/{profile_id}")
@@ -44,7 +44,7 @@ async def get_profile(request: fastapi.Request, profile_id: str):
 		"endpoint": f"GET /profiles/{profile_id}",
 		"authentication": "required",
 		"status": "success",
-		"current_user": request.headers["User"]
+		"current_user": request.headers["user"]
 	}
 
 @app.patch("/profiles/{profile_id}")
@@ -54,7 +54,7 @@ async def update_profile(request: fastapi.Request, profile_id: str):
 		"endpoint":  f"PATCH /profiles/{profile_id}",
 		"authentication": "required",
 		"status": "success",
-		"current_user": request.headers["User"]
+		"current_user": request.headers["user"]
 	}
 
 @app.delete("/profiles/{profile_id}")
