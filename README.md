@@ -43,12 +43,12 @@ sequenceDiagram
  Note over C, A: Authentication flow
  C->>G: POST /auth/users
  G->>A: POST /auth/users
- A->>G: 201 Created
- G->>C: 201 Created
+ A-->>G: 201 Created
+ G-->>C: 201 Created
  C->>G: POST /auth/token
  G->>A: POST /auth/token
- A->>G: 201 Created [TOKEN]
- G->>C: 201 Created [TOKEN]
+ A-->>G: 201 Created [TOKEN]
+ G-->>C: 201 Created [TOKEN]
  Note over C,S: Endpoints requiring authentication
  C->>G: POST /profiles [Authentication: Bearer <TOKEN>]
  G->>S: POST /profiles [User: <USERNAME>]
@@ -61,8 +61,8 @@ sequenceDiagram
  Note over C,S: Unsuccessful interaction
  C->>G: GET /no-such-route
  Note right of G: Endpoint not in config
- G->>C: 404 Not Found
+ G-->>C: 404 Not Found
  Note right of G: Unauthorized
  C->>G: GET /profiles [MISSING/INVALID TOKEN]
- G->>C: 401 Unauthorized
+ G-->>C: 401 Unauthorized
 ```
