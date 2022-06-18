@@ -1,19 +1,14 @@
-import re, typing
-from aiohttp import web, ClientSession
+import re
+import typing
+import async_timeout
+import logging
+
 import aiohttp.web_exceptions as web_exc
-from charset_normalizer import logging
+from aiohttp import web, ClientSession
 from jose import jwt
 
 from .schemas import ServiceEndpointSchema, JWTPayloadSchema
 from .settings import Settings
-
-
-"""
-TODO:
-1. Client error handling (timeouts, etc.)
-2. Implement refresh tokens
-3. Implement token revocation
-"""
 
 
 class Gateway(web.Application):
@@ -90,10 +85,15 @@ class Gateway(web.Application):
         Returns respose text and status
         """
 
-        async with self.session.request(
-            headers=headers, method=meth, url=url, json=data
-        ) as resp:
-            return await resp.text(), resp.status
+        with async_timeout.timeout(self.settings.timeout):
+            try:
+                async with self.session.request(
+                    headers=headers, method=meth, url=url, json=data
+                ) as resp:
+                    return await resp.text(), resp.status
+            except web_exc.ClientConnectorError:
+                logging.error(f"CLIENT CONNECTION ERROR! Target endpoint: {meth} {url}")
+                raise web_exc.HTTPServiceUnavailable
 
     async def main_handler(self, request: web.Request):
         """
