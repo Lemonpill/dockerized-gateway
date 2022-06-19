@@ -33,9 +33,8 @@
 
 
 ## Important!
-Does not and will not support HTTPS, for the reason the gateway is meant to run behind
-a reverse proxy like NGINX, which handles HTTPS traffic but does not provide JWT authentication
-in its free version
+Does not support `HTTPS`, for the reason the gateway is meant to run behind a reverse 
+proxy (like NGINX), which can handle HTTPS traffic
 
 
 ## Sequence Diagram
