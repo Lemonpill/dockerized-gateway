@@ -32,6 +32,12 @@
 3. Include `Authorization: Bearer {your_token}` in your request headers
 
 
+## Important!
+Does not and will not support HTTPS, for the reason the gateway is meant to run behind
+a reverse proxy like NGINX, which handles HTTPS traffic but does not provide JWT authentication
+in its free version
+
+
 ## Sequence Diagram
 
 ```mermaid
