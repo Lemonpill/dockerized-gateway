@@ -34,7 +34,7 @@
 
 ## Important!
 Does not support `HTTPS`, for the reason the gateway is meant to run behind a reverse 
-proxy (like NGINX), which can handle HTTPS traffic
+proxy (like NGINX), which can handle HTTPS traffic and load balancing
 
 
 ## Sequence Diagram
