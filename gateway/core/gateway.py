@@ -61,7 +61,6 @@ class Gateway(web.Application):
         Decodes JWT and returns a JWT payload object or None
         """
 
-        # Format -- Authorization: Bearer <TOKEN>
         try:
             data = jwt.decode(
                 token=token,
@@ -69,7 +68,7 @@ class Gateway(web.Application):
                 algorithms=[self.settings.jwt_alg],
             )
             return JWTPayloadSchema(**data)
-        except: ... # Return None
+        except: ...
 
     async def send_request(
         self, headers: dict, meth: str, url: str, data: str | None
@@ -97,10 +96,27 @@ class Gateway(web.Application):
 
     async def main_handler(self, request: web.Request):
         """
-        Handles all incoming HTTP requests
+        Handles all incoming HTTP requests.
+
+        1. Matches between configuration and request,
+        to determine weither the target resource
+        exists (and is available) behind the gateway.
+        If the resource is not available, raises 404
+
+        2. Authenticates the request based on the decoded
+        JWT from request headers, in order to detemine weither
+        the client is allowed to request the target resource.
+        In case request is authenticated, appends "User"
+        header with client user identifier.
+        In case JWT signature can not be verified using the
+        shared secret, raises 401
+
+        3. Forwards valid requests towards target endpoints
+        and returns service response status and body to the 
+        client in json format
         """
 
-        # Retrieve target endpoint or raise 404 Not Found
+        # 1. Retrieve target endpoint or raise 404 Not Found
         ep = self.get_target_endpoint(request.method, request.path)
         if not ep:
             raise web_exc.HTTPNotFound
@@ -110,16 +126,17 @@ class Gateway(web.Application):
         send_headers = {}
         send_body = None
 
-        # JWT Authentication
+        # 2. Authenticate request (if required)
         if ep.auth_required:
             auth_exc = web_exc.HTTPUnauthorized
+            # Authorization: Bearer <JWT>
             if "Authorization" not in request.headers:
                 raise auth_exc
             jwt_token = request.headers["Authorization"][7:]
             jwt_payload = self.get_jwt_payload(jwt_token)
             if not jwt_payload:
                 raise auth_exc
-            send_headers["user"] = jwt_payload.sub
+            send_headers["User"] = jwt_payload.sub
 
         # JSON Serialize request body or raise 400 Bad Request
         if request.can_read_body:
@@ -128,7 +145,7 @@ class Gateway(web.Application):
             except ValueError:
                 raise web_exc.HTTPBadRequest
 
-        # Send received data to the target endpoint
+        # 3. Send prepared data to the target endpoint
         response_body, response_status = await self.send_request(
             headers=send_headers,
             meth=send_method,
