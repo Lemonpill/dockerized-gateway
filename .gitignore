@@ -1,5 +1,7 @@
-**\.vscode
-**\auth-db
-**\pgadmin
+**/.vscode
+**/auth-db
+**/pgadmin
 **.log
 __pycache__
+GW-REQ
+**/alembic/versions/**
