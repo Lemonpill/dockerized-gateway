@@ -59,6 +59,8 @@ class Gateway(web.Application):
     def get_jwt_payload(self, token: str) -> JWTPayloadSchema | None:
         """
         Decodes JWT and returns a JWT payload object or None
+
+        @token:         signed JWT token
         """
 
         try:
@@ -71,14 +73,14 @@ class Gateway(web.Application):
         except: ...
 
     async def send_request(
-        self, headers: dict, meth: str, url: str, data: str | None
+        self, headers: dict, method: str, url: str, data: str | None
     ) -> typing.Tuple[str, int]:
         """
         Sends JSON request to a specified endpoint
 
         @headers:       Additional headers dictionary
-        @meth:          Request method
-        @target_url:    Target URL (base + path)
+        @method:        Request method
+        @url:           Target URL (service + path)
         @data:          Request body
 
         Returns respose text and status
@@ -87,11 +89,11 @@ class Gateway(web.Application):
         with async_timeout.timeout(self.settings.timeout):
             try:
                 async with self.session.request(
-                    headers=headers, method=meth, url=url, json=data
+                    headers=headers, method=method, url=url, json=data
                 ) as resp:
                     return await resp.text(), resp.status
             except web_exc.ClientConnectorError:
-                logging.error(f"CLIENT CONNECTION ERROR! Target endpoint: {meth} {url}")
+                logging.error(f"CLIENT CONNECTION ERROR! Target endpoint: {method} {url}")
                 raise web_exc.HTTPServiceUnavailable
 
     async def main_handler(self, request: web.Request):
